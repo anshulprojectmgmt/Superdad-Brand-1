@@ -37,6 +37,45 @@ type Product =
       isComingSoon: true;
     };
 
+const PRODUCTS: Product[] = [
+  {
+    title: "Audiobook",
+    description:
+      "Create bedtime stories for your kid automated in your own voice",
+    buttonLabel: "Open Audiobook",
+    href: "https://audiobooks.superdad.tech/",
+    mediaType: "audiobook",
+    mediaSrc: "/assets/magic-bansuri.mp3",
+    sampleTitle: "Sample story - The Magic Bansuri",
+  },
+  {
+    title: "Storybook",
+    description:
+      "Surprise your child by making them the main character in their very own storybook",
+    buttonLabel: "Open Storybook",
+    href: "https://storybook.superdad.tech/",
+    mediaType: "image",
+    mediaSrc: "/assets/Cinderella.png",
+    mediaAlt: "Storybook preview",
+  },
+  {
+    title: "Talkypie",
+    description:
+      "A collection of AI-powered soft toys that talk in their own character voices, creating warm, playful conversations kids love.",
+    buttonLabel: "Coming Soon",
+    href: "#",
+    mediaType: "video",
+    mediaSrc: "/assets/Demo-video.mp4",
+    isComingSoon: true,
+  },
+];
+
+const DESKTOP_CARD_SPANS = [
+  "md:col-span-5",
+  "md:col-span-4",
+  "md:col-span-3",
+] as const;
+
 const TESTIMONIALS = [
   {
     quote:
@@ -65,39 +104,6 @@ export default function App() {
   const testimonialTouchStartXRef = useRef<number | null>(null);
   const [isTalkypieMuted, setIsTalkypieMuted] = useState(true);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
-
-  const products: Product[] = [
-    {
-      title: "Audiobook",
-      description:
-        "Create bedtime stories for your kid automated in your own voice",
-      buttonLabel: "Open Audiobook",
-      href: "https://audiobooks.superdad.tech/",
-      mediaType: "audiobook",
-      mediaSrc: "/assets/magic-bansuri.mp3",
-      sampleTitle: "Sample story - The Magic Bansuri",
-    },
-    {
-      title: "Storybook",
-      description:
-        "Surprise your child by making them the main character in their very own storybook",
-      buttonLabel: "Open Storybook",
-      href: "https://storybook.superdad.tech/",
-      mediaType: "image",
-      mediaSrc: "/assets/Cinderella.png",
-      mediaAlt: "Storybook preview",
-    },
-    {
-      title: "Talkypie",
-      description:
-        "A collection of AI-powered soft toys that talk in their own character voices, creating warm, playful conversations kids love.",
-      buttonLabel: "Coming Soon",
-      href: "#",
-      mediaType: "video",
-      mediaSrc: "/assets/Demo-video.mp4",
-      isComingSoon: true,
-    },
-  ];
 
   const handleTalkypieMuteToggle = () => {
     const nextMutedState = !isTalkypieMuted;
@@ -162,7 +168,7 @@ export default function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#f8f7f5] text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-container">
       <header className="fixed top-0 z-50 w-full border-b border-white/20 bg-white/60 shadow-sm backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 font-['Plus_Jakarta_Sans'] leading-relaxed md:px-12 md:py-4">
+        <nav className="mx-auto flex max-w-7xl items-center px-5 py-3 font-['Plus_Jakarta_Sans'] leading-relaxed md:px-12 md:py-4">
           <div className="flex items-center gap-2">
             <div className="rounded-[1rem] bg-[#f9f3ea] p-1.5 shadow-[0_14px_30px_rgba(48,41,80,0.1)] ring-1 ring-[#e7dccd] md:rounded-[1.1rem] md:p-2">
               <img
@@ -175,30 +181,10 @@ export default function App() {
               SuperDad
             </span>
           </div>
-          <div className="hidden items-center gap-8 md:flex">
-            <a
-              className="font-semibold text-orange-900 transition-all duration-300"
-              href="#"
-            >
-              Home
-            </a>
-            <a
-              className="text-slate-800 transition-all duration-300 hover:text-orange-600"
-              href="#"
-            >
-              Stories
-            </a>
-            <a
-              className="text-slate-800 transition-all duration-300 hover:text-orange-600"
-              href="#"
-            >
-              Archive
-            </a>
-          </div>
         </nav>
       </header>
 
-      <div className="pointer-events-none fixed inset-x-0 top-[4.25rem] z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(106px+env(safe-area-inset-bottom))] md:bottom-0 md:top-24">
+      <div className="pointer-events-none fixed inset-x-0 top-[4.25rem] z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(106px+env(safe-area-inset-bottom))] md:hidden">
         <picture className="absolute inset-0 block h-full w-full">
           <source
             media="(min-width: 768px)"
@@ -213,42 +199,64 @@ export default function App() {
       </div>
 
       <main className="relative z-10">
-        <section className="relative min-h-[100dvh] overflow-hidden md:h-[100svh]">
-          <div className="absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:px-12">
-            <div className="mx-auto flex min-h-[106px] max-w-7xl items-end justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-center md:h-[176px] md:items-center md:px-0 md:pb-0 md:pt-0">
-              <div className="max-w-2xl md:max-w-5xl">
-                <h2 className="text-[clamp(2rem,9.1vw,2.55rem)] font-bold leading-[0.94] tracking-[0.035em] text-on-surface md:hidden">
+        <section className="relative min-h-[100dvh] overflow-hidden md:hidden">
+          <div className="absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+            <div className="mx-auto flex min-h-[106px] max-w-7xl items-end justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-center">
+              <div className="max-w-2xl">
+                <h2 className="text-[clamp(2rem,9.1vw,2.55rem)] font-bold leading-[0.94] tracking-[0.035em] text-on-surface">
                   Our Joyful
                   <br />
                   <span className="text-orange-700">Creations</span>
-                </h2>
-                <h2 className="hidden font-bold leading-[0.9] tracking-[0.03em] text-on-surface md:block md:text-[4.6rem] lg:text-[5.4rem]">
-                  <span className="block">Our Joyful</span>
-                  <span className="block text-orange-700">Creations</span>
                 </h2>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="relative bg-white/72 px-6 pb-32 pt-0 backdrop-blur-xl md:px-12">
+        <section className="relative hidden px-12 pb-12 pt-14 md:block">
+          <div className="mx-auto max-w-6xl">
+            <div className="rounded-[2.25rem] border border-white/75 bg-white/72 p-5 shadow-[0_28px_70px_rgba(17,24,39,0.14)] backdrop-blur-xl">
+              <div className="overflow-hidden rounded-[1.85rem] border border-[#eee2d0] bg-[radial-gradient(circle_at_top,_rgba(255,255,255,0.96)_0%,_rgba(248,239,225,0.96)_60%,_rgba(244,230,208,0.94)_100%)] px-6 pt-6">
+                <img
+                  src="/assets/desktopsuperdad.png"
+                  alt="SuperDad hero artwork"
+                  className="mx-auto block w-full max-w-5xl object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section
+          id="creations"
+          className="relative bg-white/72 px-6 pb-32 pt-0 backdrop-blur-xl md:px-12 md:pb-28 md:pt-8"
+        >
           <div className="mx-auto max-w-7xl">
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
-              {products.map((product) => (
+            <div className="mb-10 hidden text-center md:block">
+              <h2 className="text-[3.3rem] font-bold leading-[0.94] tracking-[-0.04em] text-on-surface">
+                Our Joyful
+                <span className="block text-orange-700">Creations</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-12 md:gap-8">
+              {PRODUCTS.map((product, index) => (
                 <div
                   key={product.title}
-                  className="group flex flex-col rounded-xl border border-white/50 bg-white/90 p-8 shadow-lg transition-all duration-400 hover:shadow-2xl backdrop-blur-sm"
+                  className={`group flex flex-col rounded-xl border border-white/50 bg-white/90 p-8 shadow-lg transition-all duration-400 hover:shadow-2xl backdrop-blur-sm md:rounded-[1.8rem] md:border-white/75 md:bg-white/84 md:p-8 md:shadow-[0_22px_55px_rgba(17,24,39,0.09)] ${DESKTOP_CARD_SPANS[index]}`}
                 >
-                  <h3 className="mb-2 text-center text-2xl font-extrabold tracking-tight text-on-surface md:text-[1.7rem]">
+                  <h3 className="mb-2 text-center text-2xl font-extrabold tracking-tight text-on-surface md:text-left md:text-[2rem]">
                     {product.title}
                   </h3>
-                  <p className="mx-auto mb-6 max-w-[30ch] text-center text-[1.1rem] font-[700] leading-relaxed text-on-surface-variant md:text-[0.97rem] md:font-normal">
+                  <p className="mx-auto mb-6 max-w-[30ch] text-center text-[1.1rem] font-[700] leading-relaxed text-on-surface-variant md:mx-0 md:max-w-[34ch] md:text-left md:text-[1rem] md:font-medium">
                     {product.description}
                   </p>
 
                   <div
                     className={`relative mb-6 overflow-hidden rounded-lg bg-white ${
                       product.mediaType === "audiobook" ? "" : "aspect-4/3"
+                    } md:rounded-[1.4rem] md:border md:border-white/60 md:bg-[#fbfaf7] ${
+                      product.mediaType === "audiobook" ? "md:p-1.5" : "md:p-4"
                     }`}
                   >
                     {product.mediaType === "audiobook" ? (
@@ -282,7 +290,7 @@ export default function App() {
                         <button
                           type="button"
                           onClick={handleTalkypieMuteToggle}
-                          className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-tertiary shadow-sm backdrop-blur-md transition hover:bg-white"
+                          className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-tertiary shadow-sm backdrop-blur-md transition hover:bg-white md:right-6 md:top-6 md:rounded-full md:border md:border-white/70 md:px-4 md:py-2"
                         >
                           {isTalkypieMuted ? "Unmute" : "Mute"}
                         </button>
@@ -291,12 +299,12 @@ export default function App() {
                   </div>
 
                   {product.isComingSoon ? (
-                    <div className="mt-auto flex w-full items-center justify-center rounded-xl border-2 border-tertiary/60 py-4 text-center font-bold text-tertiary/80">
+                    <div className="mt-auto flex w-full items-center justify-center rounded-xl border-2 border-tertiary/60 py-4 text-center font-bold text-tertiary/80 md:rounded-[1.2rem]">
                       {product.buttonLabel}
                     </div>
                   ) : (
                     <a
-                      className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border-2 border-tertiary py-4 font-bold text-tertiary transition-all duration-300 hover:bg-tertiary hover:text-on-tertiary"
+                      className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border-2 border-tertiary py-4 font-bold text-tertiary transition-all duration-300 hover:bg-tertiary hover:text-on-tertiary md:rounded-[1.2rem]"
                       href={product.href}
                     >
                       {product.buttonLabel}
@@ -311,16 +319,16 @@ export default function App() {
           </div>
         </section>
 
-        <section className="relative bg-white/40 py-24 backdrop-blur-lg">
-          <div className="mx-auto max-w-3xl px-6">
-            <div className="mb-6 text-center">
+        <section className="relative bg-white/40 py-24 backdrop-blur-lg md:py-28">
+          <div className="mx-auto max-w-5xl px-6 md:px-12">
+            <div className="mb-8 text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.22em] text-tertiary">
                 Testimonials
               </p>
             </div>
 
             <div
-              className="select-none rounded-2xl border border-white/60 bg-white/88 p-8 text-center shadow-lg backdrop-blur-sm"
+              className="select-none rounded-2xl border border-white/60 bg-white/88 p-8 text-center shadow-lg backdrop-blur-sm md:rounded-[2rem] md:p-10 md:shadow-[0_24px_60px_rgba(17,24,39,0.1)]"
               aria-live="polite"
               onTouchStart={handleTestimonialTouchStart}
               onTouchEnd={handleTestimonialTouchEnd}
@@ -329,11 +337,11 @@ export default function App() {
               }}
               style={{ touchAction: "pan-y" }}
             >
-              <p className="text-2xl font-semibold leading-relaxed text-on-secondary-fixed md:text-3xl">
+              <p className="text-2xl font-semibold leading-relaxed text-on-secondary-fixed md:text-[2.4rem] md:leading-[1.32]">
                 "{TESTIMONIALS[activeTestimonialIndex].quote}"
               </p>
               <div className="mt-6">
-                <p className="text-base font-bold text-on-surface">
+                <p className="text-base font-bold text-on-surface md:text-lg">
                   {TESTIMONIALS[activeTestimonialIndex].name}
                 </p>
                 <p className="mt-1 text-sm text-on-surface-variant">
