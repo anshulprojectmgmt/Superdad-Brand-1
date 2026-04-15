@@ -214,7 +214,7 @@ export default function App() {
                   <h3 className="mb-2 text-center text-2xl font-extrabold tracking-tight text-on-surface md:text-[1.7rem]">
                     {product.title}
                   </h3>
-                  <p className="mx-auto mb-6 max-w-[30ch] text-center text-sm leading-relaxed text-on-surface-variant md:text-[0.97rem]">
+                  <p className="mx-auto mb-6 max-w-[30ch] text-center text-[1.1rem] font-[700] leading-relaxed text-on-surface-variant md:text-[0.97rem] md:font-normal">
                     {product.description}
                   </p>
 
