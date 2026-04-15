@@ -49,12 +49,17 @@ const DESKTOP_HERO_ASSET = {
 
 const HERO_GAP_PX = 4;
 const HERO_HEADING_REVEAL = "clamp(56px, 8vw, 88px)";
+const MOBILE_FOLD_HEIGHT_PX = 826;
+const DESKTOP_HEADING_BOX_HEIGHT_PX = 176;
 
 const estimateHeroImageBottom = (viewportWidth: number, viewportHeight: number) => {
   const isDesktop = viewportWidth >= 768;
   const topOffset = isDesktop ? 96 : 80;
   const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
-  const scale = Math.min(viewportWidth / asset.width, (viewportHeight - topOffset) / asset.height);
+  const availableHeight = isDesktop
+    ? viewportHeight - topOffset - DESKTOP_HEADING_BOX_HEIGHT_PX
+    : viewportHeight - topOffset;
+  const scale = Math.min(viewportWidth / asset.width, availableHeight / asset.height);
 
   return Math.round(topOffset + asset.height * scale);
 };
@@ -62,7 +67,11 @@ const estimateHeroImageBottom = (viewportWidth: number, viewportHeight: number) 
 export default function App() {
   const talkypieVideoRef = useRef<HTMLVideoElement | null>(null);
   const heroFrameRef = useRef<HTMLDivElement | null>(null);
+  const heroArtworkRef = useRef<HTMLPictureElement | null>(null);
   const [isTalkypieMuted, setIsTalkypieMuted] = useState(true);
+  const [isDesktopViewport, setIsDesktopViewport] = useState(() =>
+    typeof window === "undefined" ? true : window.innerWidth >= 768,
+  );
   const [heroImageBottom, setHeroImageBottom] = useState(() =>
     typeof window === "undefined" ? 0 : estimateHeroImageBottom(window.innerWidth, window.innerHeight),
   );
@@ -111,21 +120,23 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined" || !heroFrameRef.current) {
+    if (typeof window === "undefined" || !heroFrameRef.current || !heroArtworkRef.current) {
       return undefined;
     }
 
     const heroFrame = heroFrameRef.current;
+    const heroArtwork = heroArtworkRef.current;
     let frameId = 0;
     let resizeObserver: ResizeObserver | null = null;
 
     const updateHeroImageBottom = () => {
-      const rect = heroFrame.getBoundingClientRect();
+      const rect = heroArtwork.getBoundingClientRect();
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
       const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
       const scale = Math.min(rect.width / asset.width, rect.height / asset.height);
       const nextBottom = Math.round(rect.top + asset.height * scale);
 
+      setIsDesktopViewport(isDesktop);
       setHeroImageBottom((current) => (Math.abs(current - nextBottom) <= 1 ? current : nextBottom));
     };
 
@@ -140,6 +151,7 @@ export default function App() {
     if (typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(scheduleUpdate);
       resizeObserver.observe(heroFrame);
+      resizeObserver.observe(heroArtwork);
     }
 
     return () => {
@@ -202,7 +214,13 @@ export default function App() {
           />
         </picture>
 
-        <picture className="relative block h-full w-full">
+        <picture
+          ref={heroArtworkRef}
+          className="relative block h-full w-full"
+          style={{
+            height: isDesktopViewport ? `calc(100% - ${DESKTOP_HEADING_BOX_HEIGHT_PX}px)` : "100%",
+          }}
+        >
           <source media="(min-width: 768px)" srcSet="/assets/desktopsuperdad.png" />
           <img
             src="/assets/Mobilesuperdad.png"
@@ -216,21 +234,29 @@ export default function App() {
         <section
           aria-hidden="true"
           className="relative w-full"
-          style={{ height: `${heroImageBottom}px` }}
+          style={{ height: isDesktopViewport ? `${heroImageBottom}px` : `${MOBILE_FOLD_HEIGHT_PX}px` }}
         />
 
         <section
-          className="relative border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:px-12"
+          className="relative flex items-end justify-center border-t border-white/20 bg-white/72 px-6 pb-4 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:flex md:items-center md:justify-center md:px-12 md:pb-0"
           style={{
-            marginTop: `calc(-1 * ${HERO_HEADING_REVEAL})`,
-            minHeight: `calc(100svh - ${heroImageBottom}px + ${HERO_HEADING_REVEAL})`,
-            paddingTop: `${HERO_GAP_PX}px`,
+            marginTop: isDesktopViewport ? "0px" : `calc(-1 * ${HERO_HEADING_REVEAL})`,
+            minHeight: isDesktopViewport
+              ? `${DESKTOP_HEADING_BOX_HEIGHT_PX}px`
+              : `calc(${MOBILE_FOLD_HEIGHT_PX}px - ${heroImageBottom}px + ${HERO_HEADING_REVEAL})`,
+            paddingTop: isDesktopViewport ? "0px" : `${HERO_GAP_PX}px`,
           }}
         >
-          <div className="mx-auto flex min-h-full max-w-7xl items-end justify-center pb-2 text-center md:pb-3">
-            <div className="max-w-2xl">
-              <h2 className="text-4xl font-bold leading-none tracking-tight text-on-surface md:text-5xl">
-                Our Joyful Creations
+          <div className="mx-auto flex min-h-full max-w-7xl items-end justify-center text-center md:items-center md:pb-0">
+            <div className="max-w-2xl md:max-w-5xl">
+              <h2 className="text-[2.15rem] font-bold leading-[1.08] tracking-[0.02em] text-on-surface md:hidden">
+                Our Joyful
+                <br />
+                <span className="text-orange-700">Creations</span>
+              </h2>
+              <h2 className="hidden font-bold leading-[0.9] tracking-[0.03em] text-on-surface md:block md:text-[4.6rem] lg:text-[5.4rem]">
+                <span className="block">Our Joyful</span>
+                <span className="block text-orange-700">Creations</span>
               </h2>
             </div>
           </div>
