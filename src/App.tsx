@@ -328,7 +328,7 @@ export default function App() {
         </section>
       </main>
 
-      <footer className="w-full border-t border-white/20 bg-white/80 py-12 font-['Plus_Jakarta_Sans'] text-sm tracking-wide backdrop-blur-md">
+      <footer className="w-full border-t border-white/20 bg-white/80 py-12 font-['Plus_Jakarta_Sans'] text-[1.1rem] font-semibold tracking-wide backdrop-blur-md">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-8 md:flex-row md:px-24">
           <div className="flex flex-col items-center gap-2 md:items-start">
             <span className="text-lg font-bold text-slate-900">SuperDad</span>
