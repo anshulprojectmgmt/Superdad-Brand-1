@@ -1,137 +1,374 @@
+import { useEffect, useRef, useState } from "react";
+import AudioSampleCta from "./components/AudioSampleCta";
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
  */
 
+type Product =
+  | {
+      title: string;
+      description: string;
+      buttonLabel: string;
+      href: string;
+      mediaType: "audiobook";
+      mediaSrc: string;
+      sampleTitle: string;
+      isComingSoon?: false;
+    }
+  | {
+      title: string;
+      description: string;
+      buttonLabel: string;
+      href: string;
+      mediaType: "image";
+      mediaSrc: string;
+      mediaAlt: string;
+      isComingSoon?: false;
+    }
+  | {
+      title: string;
+      description: string;
+      buttonLabel: string;
+      href: string;
+      mediaType: "video";
+      mediaSrc: string;
+      isComingSoon: true;
+    };
+
+const MOBILE_HERO_ASSET = {
+  width: 800,
+  height: 1328,
+};
+
+const DESKTOP_HERO_ASSET = {
+  width: 1536,
+  height: 688,
+};
+
+const HERO_GAP_PX = 4;
+const HERO_HEADING_REVEAL = "clamp(56px, 8vw, 88px)";
+
+const estimateHeroImageBottom = (viewportWidth: number, viewportHeight: number) => {
+  const isDesktop = viewportWidth >= 768;
+  const topOffset = isDesktop ? 96 : 80;
+  const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
+  const scale = Math.min(viewportWidth / asset.width, (viewportHeight - topOffset) / asset.height);
+
+  return Math.round(topOffset + asset.height * scale);
+};
+
 export default function App() {
+  const talkypieVideoRef = useRef<HTMLVideoElement | null>(null);
+  const heroFrameRef = useRef<HTMLDivElement | null>(null);
+  const [isTalkypieMuted, setIsTalkypieMuted] = useState(true);
+  const [heroImageBottom, setHeroImageBottom] = useState(() =>
+    typeof window === "undefined" ? 0 : estimateHeroImageBottom(window.innerWidth, window.innerHeight),
+  );
+
+  const products: Product[] = [
+    {
+      title: "Audiobook",
+      description:
+        "Create bedtime stories for your kid automated in your own voice",
+      buttonLabel: "Open Audiobook",
+      href: "https://audiobooks.superdad.tech/",
+      mediaType: "audiobook",
+      mediaSrc: "/assets/magic-bansuri.mp3",
+      sampleTitle: "Sample story - The Magic Bansuri",
+    },
+    {
+      title: "Storybook",
+      description:
+        "Surprise your child by making them the main character in their very own storybook",
+      buttonLabel: "Open Storybook",
+      href: "https://storybook.superdad.tech/",
+      mediaType: "image",
+      mediaSrc: "/assets/Cinderella.png",
+      mediaAlt: "Storybook preview",
+    },
+    {
+      title: "Talkypie",
+      description:
+        "A collection of AI-powered soft toys that talk in their own character voices, creating warm, playful conversations kids love.",
+      buttonLabel: "Coming Soon",
+      href: "#",
+      mediaType: "video",
+      mediaSrc: "/assets/Demo-video.mp4",
+      isComingSoon: true,
+    },
+  ];
+
+  const handleTalkypieMuteToggle = () => {
+    const nextMutedState = !isTalkypieMuted;
+
+    setIsTalkypieMuted(nextMutedState);
+
+    if (talkypieVideoRef.current) {
+      talkypieVideoRef.current.muted = nextMutedState;
+    }
+  };
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !heroFrameRef.current) {
+      return undefined;
+    }
+
+    const heroFrame = heroFrameRef.current;
+    let frameId = 0;
+    let resizeObserver: ResizeObserver | null = null;
+
+    const updateHeroImageBottom = () => {
+      const rect = heroFrame.getBoundingClientRect();
+      const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+      const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
+      const scale = Math.min(rect.width / asset.width, rect.height / asset.height);
+      const nextBottom = Math.round(rect.top + asset.height * scale);
+
+      setHeroImageBottom((current) => (Math.abs(current - nextBottom) <= 1 ? current : nextBottom));
+    };
+
+    const scheduleUpdate = () => {
+      window.cancelAnimationFrame(frameId);
+      frameId = window.requestAnimationFrame(updateHeroImageBottom);
+    };
+
+    scheduleUpdate();
+    window.addEventListener("resize", scheduleUpdate);
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(scheduleUpdate);
+      resizeObserver.observe(heroFrame);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+      window.removeEventListener("resize", scheduleUpdate);
+      resizeObserver?.disconnect();
+    };
+  }, []);
+
   return (
-    <div className="text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-container">
-      {/* Top Navigation Shell */}
-      <header className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl border-b border-white/20 shadow-sm">
-        <nav className="flex justify-between items-center px-6 md:px-12 py-4 max-w-7xl mx-auto font-['Plus_Jakarta_Sans'] leading-relaxed">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#f8f7f5] text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-container">
+      <header className="fixed top-0 z-50 w-full border-b border-white/20 bg-white/60 shadow-sm backdrop-blur-xl">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 font-['Plus_Jakarta_Sans'] leading-relaxed md:px-12">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-orange-700" style={{ fontVariationSettings: "'FILL' 1" }}>auto_stories</span>
-            <span className="text-2xl font-bold tracking-tight text-orange-800">SuperDad</span>
+            <div className="rounded-[1.1rem] bg-[#f9f3ea] p-2 shadow-[0_14px_30px_rgba(48,41,80,0.1)] ring-1 ring-[#e7dccd]">
+              <img
+                src="/assets/superdad-header-logo.png"
+                alt="SuperDad logo"
+                className="h-11 w-11 rounded-[0.8rem] object-contain md:h-12 md:w-12"
+              />
+            </div>
+            <span className="text-2xl font-bold tracking-tight text-orange-800">
+              SuperDad
+            </span>
           </div>
-          <div className="hidden md:flex gap-8 items-center">
-            <a className="text-orange-900 font-semibold transition-all duration-300" href="#">Home</a>
-            <a className="text-slate-800 hover:text-orange-600 transition-all duration-300" href="#">Stories</a>
-            <a className="text-slate-800 hover:text-orange-600 transition-all duration-300" href="#">Archive</a>
+          <div className="hidden items-center gap-8 md:flex">
+            <a
+              className="font-semibold text-orange-900 transition-all duration-300"
+              href="#"
+            >
+              Home
+            </a>
+            <a
+              className="text-slate-800 transition-all duration-300 hover:text-orange-600"
+              href="#"
+            >
+              Stories
+            </a>
+            <a
+              className="text-slate-800 transition-all duration-300 hover:text-orange-600"
+              href="#"
+            >
+              Archive
+            </a>
           </div>
-          {/* Get Started button removed as requested */}
         </nav>
       </header>
 
-      {/* Fixed Background Image for Overlay Animation */}
-      <div className="fixed inset-0 z-[-1] bg-[#f8f7f5] pt-24 pb-[12vh]">
-        <img 
-          src="https://lh3.googleusercontent.com/aida/ADBb0uhtRLIYxrcyTTYbVlPh4k1ezOCqYqNoq2h3EyxebtxciQXc8oTyWeWw_8eyzt5u4_BQjBLXqpgnFFfsTXk2-pf6e0zbOLGP8EsKYyEBbMjD_yG5T46rkvWeMEbe4LY0WyQd1cFStudpqpuadhFFw2nWg7YmKMiYR8ANXwBNqLb0DnFqlsFVOu0JqnwcUXKlLw2-JspLCBIuHRU3cU3NFNOMu5f9ywvJQH_g7OTUim2BZFBxkevVJT2ufQyLYJIyEGzGdbNJ5YyTog0" 
-          alt="SuperDad Hero" 
-          className="w-full h-full object-contain object-center"
-        />
+      <div
+        ref={heroFrameRef}
+        className="pointer-events-none fixed inset-x-0 bottom-0 top-20 z-0 overflow-hidden bg-[#f8efe1] md:top-24"
+      >
+        <picture className="absolute inset-0 block h-full w-full">
+          <source media="(min-width: 768px)" srcSet="/assets/desktopsuperdad.png" />
+          <img
+            src="/assets/Mobilesuperdad.png"
+            alt=""
+            aria-hidden="true"
+            className="h-full w-full scale-115 object-cover object-center opacity-55 blur-2xl md:scale-105"
+          />
+        </picture>
+
+        <picture className="relative block h-full w-full">
+          <source media="(min-width: 768px)" srcSet="/assets/desktopsuperdad.png" />
+          <img
+            src="/assets/Mobilesuperdad.png"
+            alt="SuperDad Hero"
+            className="h-full w-full object-contain object-top"
+          />
+        </picture>
       </div>
 
-      <main>
-        {/* Hero Spacer */}
-        <section className="relative w-full h-[88vh] flex items-center justify-center">
-          {/* Transparent spacer to reveal the fixed background and allow Joyful Creations to peek from the bottom */}
-        </section>
+      <main className="relative z-10">
+        <section
+          aria-hidden="true"
+          className="relative w-full"
+          style={{ height: `${heroImageBottom}px` }}
+        />
 
-        {/* Joyful Creations Section */}
-        <section className="relative pt-8 pb-32 px-6 md:px-12 bg-white/70 backdrop-blur-md border-t border-white/50 shadow-[0_-10px_40px_rgba(0,0,0,0.05)]">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col items-center text-center mb-16 gap-6">
-              <div className="max-w-2xl">
-                <h2 className="text-4xl md:text-5xl font-bold text-on-surface mb-4 leading-tight">Joyful Creations</h2>
-                <p className="text-on-surface-variant text-lg leading-relaxed">
-                  Every moment shared is a thread in the tapestry of their future. Discover tools crafted to turn simple interactions into lasting digital treasures.
-                </p>
-              </div>
-              <div className="flex items-center gap-2 text-tertiary font-bold group cursor-pointer">
-                <span className="text-sm tracking-widest uppercase">Explore All Templates</span>
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </div>
-            </div>
-
-            {/* Bento-Style Product Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              
-              {/* Product Card 1 */}
-              <div className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-400 border border-white/50 flex flex-col p-8">
-                <h3 className="text-xl font-bold text-on-surface mb-3">Midnight Fables</h3>
-                <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
-                  A curated collection of prompts and visual templates designed for late-night storytelling and deep bonding.
-                </p>
-                <div className="aspect-[4/3] overflow-hidden relative rounded-lg mb-6">
-                  <img alt="Story Starter kit" className="w-full h-full transition-transform duration-700 group-hover:scale-105 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW4LGLltUn0CPPgTIsGOkjvA9Z90b6tRtg5_Xa_aP5JiUzw4vOG1tXNk3U_aiFT9rVXsamAd0-9xrTUtLrD0cihVAnfsRSx3P6ElH1CjWzP1z8ko6SuBn25B95TG8fEYVSs_PVXcayrEc3beilXMm4a4ve3w_LFQnUWlDMKmqdP3KMqGahHzLv8CzRjkXZv-f16e_h3MQagTSg4XJ3117-Cwxd_z6Gj4SqzNF6BV3F-BUfCY1rZU48Eq0lI5psixSn-38oHgzfQNoH"/>
-                  <div className="absolute top-4 left-4">
-                    <span className="bg-white/90 backdrop-blur-md text-tertiary px-3 py-1 rounded-full text-xs font-bold shadow-sm">NEW</span>
-                  </div>
-                </div>
-                <button className="w-full py-4 rounded-xl border-2 border-tertiary text-tertiary font-bold hover:bg-tertiary hover:text-on-tertiary transition-all duration-300 flex items-center justify-center gap-2 mt-auto">
-                  Open Product
-                  <span className="material-symbols-outlined text-sm">open_in_new</span>
-                </button>
-              </div>
-
-              {/* Product Card 2 */}
-              <div className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-400 border border-white/50 flex flex-col p-8">
-                <h3 className="text-xl font-bold text-on-surface mb-3">Legacy Archive</h3>
-                <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
-                  Secure, long-term storage for voice recordings and videos, ensuring your perspective remains vivid for decades.
-                </p>
-                <div className="aspect-[4/3] overflow-hidden relative rounded-lg mb-6">
-                  <img alt="Legacy Archive" className="w-full h-full transition-transform duration-700 group-hover:scale-105 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw_vmOVZP7aamqvaHkNCMqIHgMRd8gsn4r-ITGm-T-fqrkW1O6o1kyZu8-xuqwt_Zlz-JgmCblZIHy1g9_tMOs8jvLKi-qUYEAIUUZh6tLU0u2QcAegw_o44RJpUwQKF2gW86SsLW8GieXiNCvSp60eKEFSGrNj_Jc9KtP63gCRer95qbExb1wDCYXq-VNuXKdFJ2aWDFUXiHZDfWOc4McfI1dvD0Dn_3yuLl0L65Cz8on-btP4KvWtC3CfqGhXaLEJbk1mDo2q4WJ"/>
-                </div>
-                <button className="w-full py-4 rounded-xl border-2 border-tertiary text-tertiary font-bold hover:bg-tertiary hover:text-on-tertiary transition-all duration-300 flex items-center justify-center gap-2 mt-auto">
-                  Open Product
-                  <span className="material-symbols-outlined text-sm">open_in_new</span>
-                </button>
-              </div>
-
-              {/* Product Card 3 */}
-              <div className="group bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-400 border border-white/50 flex flex-col p-8">
-                <h3 className="text-xl font-bold text-on-surface mb-3">Memory Maps</h3>
-                <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
-                  Geospatial storytelling that pins your most important lessons to the places they were first learned.
-                </p>
-                <div className="aspect-[4/3] overflow-hidden relative rounded-lg mb-6">
-                  <img alt="Memory Maps" className="w-full h-full transition-transform duration-700 group-hover:scale-105 object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwQ5H87KA1akjEFwiCYIwlrSSNtS9iQZFKCt5aa4vwovNNrqjkKj2r0t25RrubpwLhw3pqkGVJmxFVHRyWsMGpqTVB2ZsoV7U10Dx--WR4wUEqYGmppttYdC-WbJNqBPHKPZeGKp3gv-CUIjtNyYyeqKAtxy-5yzRKeefUel-zOuUuCsMqO9DSn44vMYFG6uX45dmd4qaEiFJLlIgMQjtiBvdn9QSfhI-P6yOGUYibS47vZ0NrfYHjTeZXp2vu40_qMGqbNhJ_FUBd"/>
-                </div>
-                <button className="w-full py-4 rounded-xl border-2 border-tertiary text-tertiary font-bold hover:bg-tertiary hover:text-on-tertiary transition-all duration-300 flex items-center justify-center gap-2 mt-auto">
-                  Open Product
-                  <span className="material-symbols-outlined text-sm">open_in_new</span>
-                </button>
-              </div>
-
+        <section
+          className="relative border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:px-12"
+          style={{
+            marginTop: `calc(-1 * ${HERO_HEADING_REVEAL})`,
+            minHeight: `calc(100svh - ${heroImageBottom}px + ${HERO_HEADING_REVEAL})`,
+            paddingTop: `${HERO_GAP_PX}px`,
+          }}
+        >
+          <div className="mx-auto flex min-h-full max-w-7xl items-end justify-center pb-2 text-center md:pb-3">
+            <div className="max-w-2xl">
+              <h2 className="text-4xl font-bold leading-none tracking-tight text-on-surface md:text-5xl">
+                Our Joyful Creations
+              </h2>
             </div>
           </div>
         </section>
 
-        {/* Signature Quote Section */}
-        <section className="relative py-24 bg-white/40 backdrop-blur-lg">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <span className="material-symbols-outlined text-6xl text-primary mb-8" style={{ fontVariationSettings: "'FILL' 1" }}>format_quote</span>
-            <blockquote className="text-3xl md:text-4xl font-semibold text-on-secondary-fixed italic leading-tight mb-8">
-              "The greatest legacy one can pass on to one's children and grandchildren is not money or other material things, but rather a legacy of character and faith."
+        <section className="relative bg-white/72 px-6 pb-32 pt-0 backdrop-blur-xl md:px-12">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
+              {products.map((product) => (
+                <div
+                  key={product.title}
+                  className="group flex flex-col rounded-xl border border-white/50 bg-white/90 p-8 shadow-lg transition-all duration-400 hover:shadow-2xl backdrop-blur-sm"
+                >
+                  <h3 className="mb-2 text-center text-2xl font-extrabold tracking-tight text-on-surface md:text-[1.7rem]">
+                    {product.title}
+                  </h3>
+                  <p className="mx-auto mb-6 max-w-[30ch] text-center text-sm leading-relaxed text-on-surface-variant md:text-[0.97rem]">
+                    {product.description}
+                  </p>
+
+                  <div
+                    className={`relative mb-6 overflow-hidden rounded-lg bg-white ${
+                      product.mediaType === "audiobook" ? "" : "aspect-4/3"
+                    }`}
+                  >
+                    {product.mediaType === "audiobook" ? (
+                      <AudioSampleCta
+                        title={product.sampleTitle}
+                        src={product.mediaSrc}
+                      />
+                    ) : null}
+
+                    {product.mediaType === "image" ? (
+                      <img
+                        alt={product.mediaAlt}
+                        className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-105"
+                        src={product.mediaSrc}
+                      />
+                    ) : null}
+
+                    {product.mediaType === "video" ? (
+                      <>
+                        <video
+                          ref={talkypieVideoRef}
+                          className="h-full w-full object-contain bg-slate-100 transition-transform duration-700 group-hover:scale-105"
+                          src={product.mediaSrc}
+                          autoPlay
+                          muted={isTalkypieMuted}
+                          loop
+                          playsInline
+                          preload="metadata"
+                          aria-label="Talkypie preview"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleTalkypieMuteToggle}
+                          className="absolute right-4 top-4 rounded-full bg-white/90 px-4 py-2 text-xs font-bold text-tertiary shadow-sm backdrop-blur-md transition hover:bg-white"
+                        >
+                          {isTalkypieMuted ? "Unmute" : "Mute"}
+                        </button>
+                      </>
+                    ) : null}
+                  </div>
+
+                  {product.isComingSoon ? (
+                    <div className="mt-auto flex w-full items-center justify-center rounded-xl border-2 border-tertiary/60 py-4 text-center font-bold text-tertiary/80">
+                      {product.buttonLabel}
+                    </div>
+                  ) : (
+                    <a
+                      className="mt-auto flex w-full items-center justify-center gap-2 rounded-xl border-2 border-tertiary py-4 font-bold text-tertiary transition-all duration-300 hover:bg-tertiary hover:text-on-tertiary"
+                      href={product.href}
+                    >
+                      {product.buttonLabel}
+                      <span className="material-symbols-outlined text-sm">
+                        open_in_new
+                      </span>
+                    </a>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className="relative bg-white/40 py-24 backdrop-blur-lg">
+          <div className="mx-auto max-w-4xl px-6 text-center">
+            <span
+              className="material-symbols-outlined mb-8 text-6xl text-primary"
+              style={{ fontVariationSettings: "'FILL' 1" }}
+            >
+              format_quote
+            </span>
+            <blockquote className="mb-8 text-3xl font-semibold italic leading-tight text-on-secondary-fixed md:text-4xl">
+              "The greatest legacy one can pass on to one's children and
+              grandchildren is not money or other material things, but rather a
+              legacy of character and faith."
             </blockquote>
-            <cite className="text-lg font-bold text-tertiary uppercase tracking-widest not-italic">— Billy Graham</cite>
+            <cite className="not-italic text-lg font-bold uppercase tracking-widest text-tertiary">
+              - Billy Graham
+            </cite>
           </div>
         </section>
       </main>
 
-      {/* Footer Shell */}
-      <footer className="w-full py-12 bg-white/80 backdrop-blur-md border-t border-white/20 font-['Plus_Jakarta_Sans'] text-sm tracking-wide">
-        <div className="flex flex-col md:flex-row justify-between items-center px-8 md:px-24 max-w-7xl mx-auto gap-8">
-          <div className="flex flex-col items-center md:items-start gap-2">
+      <footer className="w-full border-t border-white/20 bg-white/80 py-12 font-['Plus_Jakarta_Sans'] text-sm tracking-wide backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-8 px-8 md:flex-row md:px-24">
+          <div className="flex flex-col items-center gap-2 md:items-start">
             <span className="text-lg font-bold text-slate-900">SuperDad</span>
-            <p className="text-slate-600">© 2024 SuperDad Digital Heirloom. All rights reserved.</p>
+            <p className="text-slate-600">
+              &copy; superdad.tech. All rights reserved.
+            </p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
-            <a className="text-slate-600 hover:text-orange-500 transition-colors duration-200" href="#">Privacy Policy</a>
-            <a className="text-slate-600 hover:text-orange-500 transition-colors duration-200" href="#">Terms of Service</a>
-            <a className="text-slate-600 hover:text-orange-500 transition-colors duration-200" href="#">Contact Us</a>
-            <a className="text-slate-600 hover:text-orange-500 transition-colors duration-200" href="#">Our Story</a>
+            <a
+              className="text-slate-600 transition-colors duration-200 hover:text-orange-500"
+              href="#"
+            >
+              Privacy Policy
+            </a>
+            <a
+              className="text-slate-600 transition-colors duration-200 hover:text-orange-500"
+              href="#"
+            >
+              Terms of Service
+            </a>
+            <a
+              className="text-slate-600 transition-colors duration-200 hover:text-orange-500"
+              href="#"
+            >
+              Contact Us
+            </a>
+            <a
+              className="text-slate-600 transition-colors duration-200 hover:text-orange-500"
+              href="#"
+            >
+              Our Story
+            </a>
           </div>
         </div>
       </footer>
