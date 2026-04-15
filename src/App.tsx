@@ -162,16 +162,16 @@ export default function App() {
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#f8f7f5] text-on-surface selection:bg-tertiary-fixed selection:text-on-tertiary-container">
       <header className="fixed top-0 z-50 w-full border-b border-white/20 bg-white/60 shadow-sm backdrop-blur-xl">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 font-['Plus_Jakarta_Sans'] leading-relaxed md:px-12">
+        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 font-['Plus_Jakarta_Sans'] leading-relaxed md:px-12 md:py-4">
           <div className="flex items-center gap-2">
-            <div className="rounded-[1.1rem] bg-[#f9f3ea] p-2 shadow-[0_14px_30px_rgba(48,41,80,0.1)] ring-1 ring-[#e7dccd]">
+            <div className="rounded-[1rem] bg-[#f9f3ea] p-1.5 shadow-[0_14px_30px_rgba(48,41,80,0.1)] ring-1 ring-[#e7dccd] md:rounded-[1.1rem] md:p-2">
               <img
                 src="/assets/superdad-header-logo.png"
                 alt="SuperDad logo"
-                className="h-11 w-11 rounded-[0.8rem] object-contain md:h-12 md:w-12"
+                className="h-10 w-10 rounded-[0.75rem] object-contain md:h-12 md:w-12 md:rounded-[0.8rem]"
               />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-orange-800">
+            <span className="text-[1.85rem] font-bold tracking-tight text-orange-800 md:text-2xl">
               SuperDad
             </span>
           </div>
@@ -198,7 +198,7 @@ export default function App() {
         </nav>
       </header>
 
-      <div className="pointer-events-none fixed inset-x-0 top-20 z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(124px+env(safe-area-inset-bottom))] md:bottom-0 md:top-24">
+      <div className="pointer-events-none fixed inset-x-0 top-[4.25rem] z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(106px+env(safe-area-inset-bottom))] md:bottom-0 md:top-24">
         <picture className="absolute inset-0 block h-full w-full">
           <source
             media="(min-width: 768px)"
@@ -215,9 +215,9 @@ export default function App() {
       <main className="relative z-10">
         <section className="relative min-h-[100dvh] overflow-hidden md:h-[100svh]">
           <div className="absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:px-12">
-            <div className="mx-auto flex min-h-[124px] max-w-7xl items-end justify-center px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 text-center md:h-[176px] md:items-center md:px-0 md:pb-0 md:pt-0">
+            <div className="mx-auto flex min-h-[106px] max-w-7xl items-end justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-center md:h-[176px] md:items-center md:px-0 md:pb-0 md:pt-0">
               <div className="max-w-2xl md:max-w-5xl">
-                <h2 className="text-[clamp(2.15rem,9.8vw,2.75rem)] font-bold leading-[0.96] tracking-[0.035em] text-on-surface md:hidden">
+                <h2 className="text-[clamp(2rem,9.1vw,2.55rem)] font-bold leading-[0.94] tracking-[0.035em] text-on-surface md:hidden">
                   Our Joyful
                   <br />
                   <span className="text-orange-700">Creations</span>
