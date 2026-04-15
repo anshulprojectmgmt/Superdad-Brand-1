@@ -52,14 +52,41 @@ const HERO_HEADING_REVEAL = "clamp(56px, 8vw, 88px)";
 const MOBILE_FOLD_HEIGHT_PX = 826;
 const DESKTOP_HEADING_BOX_HEIGHT_PX = 176;
 
-const estimateHeroImageBottom = (viewportWidth: number, viewportHeight: number) => {
+const TESTIMONIALS = [
+  {
+    quote:
+      "The bedtime stories feel personal and calm. My daughter now asks for SuperDad before she sleeps.",
+    name: "Riya S.",
+    role: "Mom of a 5-year-old",
+  },
+  {
+    quote:
+      "The voice-based audiobook idea is brilliant. It turned our nightly routine into something we genuinely look forward to.",
+    name: "Aman K.",
+    role: "Dad of two",
+  },
+  {
+    quote:
+      "Storybook and Audiobook both feel warm and thoughtful. It is one of the few kids products that really feels made for families.",
+    name: "Neha P.",
+    role: "Parent reviewer",
+  },
+];
+
+const estimateHeroImageBottom = (
+  viewportWidth: number,
+  viewportHeight: number,
+) => {
   const isDesktop = viewportWidth >= 768;
   const topOffset = isDesktop ? 96 : 80;
   const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
   const availableHeight = isDesktop
     ? viewportHeight - topOffset - DESKTOP_HEADING_BOX_HEIGHT_PX
     : viewportHeight - topOffset;
-  const scale = Math.min(viewportWidth / asset.width, availableHeight / asset.height);
+  const scale = Math.min(
+    viewportWidth / asset.width,
+    availableHeight / asset.height,
+  );
 
   return Math.round(topOffset + asset.height * scale);
 };
@@ -69,11 +96,14 @@ export default function App() {
   const heroFrameRef = useRef<HTMLDivElement | null>(null);
   const heroArtworkRef = useRef<HTMLPictureElement | null>(null);
   const [isTalkypieMuted, setIsTalkypieMuted] = useState(true);
+  const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
   const [isDesktopViewport, setIsDesktopViewport] = useState(() =>
     typeof window === "undefined" ? true : window.innerWidth >= 768,
   );
   const [heroImageBottom, setHeroImageBottom] = useState(() =>
-    typeof window === "undefined" ? 0 : estimateHeroImageBottom(window.innerWidth, window.innerHeight),
+    typeof window === "undefined"
+      ? 0
+      : estimateHeroImageBottom(window.innerWidth, window.innerHeight),
   );
 
   const products: Product[] = [
@@ -120,7 +150,11 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (typeof window === "undefined" || !heroFrameRef.current || !heroArtworkRef.current) {
+    if (
+      typeof window === "undefined" ||
+      !heroFrameRef.current ||
+      !heroArtworkRef.current
+    ) {
       return undefined;
     }
 
@@ -133,11 +167,16 @@ export default function App() {
       const rect = heroArtwork.getBoundingClientRect();
       const isDesktop = window.matchMedia("(min-width: 768px)").matches;
       const asset = isDesktop ? DESKTOP_HERO_ASSET : MOBILE_HERO_ASSET;
-      const scale = Math.min(rect.width / asset.width, rect.height / asset.height);
+      const scale = Math.min(
+        rect.width / asset.width,
+        rect.height / asset.height,
+      );
       const nextBottom = Math.round(rect.top + asset.height * scale);
 
       setIsDesktopViewport(isDesktop);
-      setHeroImageBottom((current) => (Math.abs(current - nextBottom) <= 1 ? current : nextBottom));
+      setHeroImageBottom((current) =>
+        Math.abs(current - nextBottom) <= 1 ? current : nextBottom,
+      );
     };
 
     const scheduleUpdate = () => {
@@ -158,6 +197,18 @@ export default function App() {
       window.cancelAnimationFrame(frameId);
       window.removeEventListener("resize", scheduleUpdate);
       resizeObserver?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setActiveTestimonialIndex(
+        (current) => (current + 1) % TESTIMONIALS.length,
+      );
+    }, 4000);
+
+    return () => {
+      window.clearInterval(intervalId);
     };
   }, []);
 
@@ -205,7 +256,10 @@ export default function App() {
         className="pointer-events-none fixed inset-x-0 bottom-0 top-20 z-0 overflow-hidden bg-[#f8efe1] md:top-24"
       >
         <picture className="absolute inset-0 block h-full w-full">
-          <source media="(min-width: 768px)" srcSet="/assets/desktopsuperdad.png" />
+          <source
+            media="(min-width: 768px)"
+            srcSet="/assets/desktopsuperdad.png"
+          />
           <img
             src="/assets/Mobilesuperdad.png"
             alt=""
@@ -218,10 +272,15 @@ export default function App() {
           ref={heroArtworkRef}
           className="relative block h-full w-full"
           style={{
-            height: isDesktopViewport ? `calc(100% - ${DESKTOP_HEADING_BOX_HEIGHT_PX}px)` : "100%",
+            height: isDesktopViewport
+              ? `calc(100% - ${DESKTOP_HEADING_BOX_HEIGHT_PX}px)`
+              : "100%",
           }}
         >
-          <source media="(min-width: 768px)" srcSet="/assets/desktopsuperdad.png" />
+          <source
+            media="(min-width: 768px)"
+            srcSet="/assets/desktopsuperdad.png"
+          />
           <img
             src="/assets/Mobilesuperdad.png"
             alt="SuperDad Hero"
@@ -234,13 +293,19 @@ export default function App() {
         <section
           aria-hidden="true"
           className="relative w-full"
-          style={{ height: isDesktopViewport ? `${heroImageBottom}px` : `${MOBILE_FOLD_HEIGHT_PX}px` }}
+          style={{
+            height: isDesktopViewport
+              ? `${heroImageBottom}px`
+              : `${MOBILE_FOLD_HEIGHT_PX}px`,
+          }}
         />
 
         <section
           className="relative flex items-end justify-center border-t border-white/20 bg-white/72 px-6 pb-4 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:flex md:items-center md:justify-center md:px-12 md:pb-0"
           style={{
-            marginTop: isDesktopViewport ? "0px" : `calc(-1 * ${HERO_HEADING_REVEAL})`,
+            marginTop: isDesktopViewport
+              ? "0px"
+              : `calc(-1 * ${HERO_HEADING_REVEAL})`,
             minHeight: isDesktopViewport
               ? `${DESKTOP_HEADING_BOX_HEIGHT_PX}px`
               : `calc(${MOBILE_FOLD_HEIGHT_PX}px - ${heroImageBottom}px + ${HERO_HEADING_REVEAL})`,
@@ -343,21 +408,46 @@ export default function App() {
         </section>
 
         <section className="relative bg-white/40 py-24 backdrop-blur-lg">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <span
-              className="material-symbols-outlined mb-8 text-6xl text-primary"
-              style={{ fontVariationSettings: "'FILL' 1" }}
+          <div className="mx-auto max-w-3xl px-6">
+            <div className="mb-6 text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.22em] text-tertiary">
+                Testimonials
+              </p>
+            </div>
+
+            <div
+              className="rounded-2xl border border-white/60 bg-white/88 p-8 text-center shadow-lg backdrop-blur-sm"
+              aria-live="polite"
             >
-              format_quote
-            </span>
-            <blockquote className="mb-8 text-3xl font-semibold italic leading-tight text-on-secondary-fixed md:text-4xl">
-              "The greatest legacy one can pass on to one's children and
-              grandchildren is not money or other material things, but rather a
-              legacy of character and faith."
-            </blockquote>
-            <cite className="not-italic text-lg font-bold uppercase tracking-widest text-tertiary">
-              - Billy Graham
-            </cite>
+              <p className="text-2xl font-semibold leading-relaxed text-on-secondary-fixed md:text-3xl">
+                "{TESTIMONIALS[activeTestimonialIndex].quote}"
+              </p>
+              <div className="mt-6">
+                <p className="text-base font-bold text-on-surface">
+                  {TESTIMONIALS[activeTestimonialIndex].name}
+                </p>
+                <p className="mt-1 text-sm text-on-surface-variant">
+                  {TESTIMONIALS[activeTestimonialIndex].role}
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center justify-center gap-2">
+                {TESTIMONIALS.map((testimonial, index) => (
+                  <button
+                    key={testimonial.name}
+                    type="button"
+                    onClick={() => setActiveTestimonialIndex(index)}
+                    aria-label={`Show testimonial ${index + 1}`}
+                    aria-pressed={index === activeTestimonialIndex}
+                    className={`h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-white ${
+                      index === activeTestimonialIndex
+                        ? "w-7 bg-orange-600"
+                        : "w-2.5 bg-orange-200"
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       </main>
