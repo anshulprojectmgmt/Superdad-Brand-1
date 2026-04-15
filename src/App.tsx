@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type TouchEvent } from "react";
 import AudioSampleCta from "./components/AudioSampleCta";
 
 /**
@@ -58,8 +58,11 @@ const TESTIMONIALS = [
   },
 ];
 
+const TESTIMONIAL_SWIPE_THRESHOLD_PX = 48;
+
 export default function App() {
   const talkypieVideoRef = useRef<HTMLVideoElement | null>(null);
+  const testimonialTouchStartXRef = useRef<number | null>(null);
   const [isTalkypieMuted, setIsTalkypieMuted] = useState(true);
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
 
@@ -106,12 +109,50 @@ export default function App() {
     }
   };
 
+  const showNextTestimonial = () => {
+    setActiveTestimonialIndex(
+      (current) => (current + 1) % TESTIMONIALS.length,
+    );
+  };
+
+  const showPreviousTestimonial = () => {
+    setActiveTestimonialIndex(
+      (current) => (current - 1 + TESTIMONIALS.length) % TESTIMONIALS.length,
+    );
+  };
+
+  const handleTestimonialTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    testimonialTouchStartXRef.current = event.touches[0]?.clientX ?? null;
+  };
+
+  const handleTestimonialTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const startX = testimonialTouchStartXRef.current;
+    const endX = event.changedTouches[0]?.clientX ?? null;
+
+    testimonialTouchStartXRef.current = null;
+
+    if (startX === null || endX === null) {
+      return;
+    }
+
+    const deltaX = endX - startX;
+
+    if (Math.abs(deltaX) < TESTIMONIAL_SWIPE_THRESHOLD_PX) {
+      return;
+    }
+
+    if (deltaX < 0) {
+      showNextTestimonial();
+      return;
+    }
+
+    showPreviousTestimonial();
+  };
+
   useEffect(() => {
     const intervalId = window.setInterval(() => {
-      setActiveTestimonialIndex(
-        (current) => (current + 1) % TESTIMONIALS.length,
-      );
-    }, 2000);
+      showNextTestimonial();
+    }, 5000);
 
     return () => {
       window.clearInterval(intervalId);
@@ -292,8 +333,14 @@ export default function App() {
             </div>
 
             <div
-              className="rounded-2xl border border-white/60 bg-white/88 p-8 text-center shadow-lg backdrop-blur-sm"
+              className="select-none rounded-2xl border border-white/60 bg-white/88 p-8 text-center shadow-lg backdrop-blur-sm"
               aria-live="polite"
+              onTouchStart={handleTestimonialTouchStart}
+              onTouchEnd={handleTestimonialTouchEnd}
+              onTouchCancel={() => {
+                testimonialTouchStartXRef.current = null;
+              }}
+              style={{ touchAction: "pan-y" }}
             >
               <p className="text-2xl font-semibold leading-relaxed text-on-secondary-fixed md:text-3xl">
                 "{TESTIMONIALS[activeTestimonialIndex].quote}"
