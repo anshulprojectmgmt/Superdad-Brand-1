@@ -208,18 +208,17 @@ export default function App() {
             src="/assets/Mobilesuperdad.png"
             alt=""
             aria-hidden="true"
-            className="h-full w-full scale-115 object-cover object-center opacity-55 blur-2xl md:scale-105"
+            className="h-full w-full scale-[1.08] object-cover object-center opacity-80 blur-xl md:scale-[1.04] md:opacity-75 md:blur-lg"
           />
         </picture>
 
-        <div className="relative flex h-full items-end justify-center px-4 pb-[124px] md:hidden">
+        <div className="relative flex h-full items-end justify-center pb-[124px] md:hidden">
           <img
             src="/assets/Mobilesuperdad.png"
             alt="SuperDad Hero"
-            className="h-auto w-full object-contain object-top"
+            className="h-full w-full object-contain object-top"
             style={{
               maxHeight: "calc(100dvh - 12.75rem)",
-              maxWidth: "min(25.5rem, calc(100vw - 2rem))",
             }}
           />
         </div>
