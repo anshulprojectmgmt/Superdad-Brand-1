@@ -198,7 +198,7 @@ export default function App() {
         </nav>
       </header>
 
-      <div className="pointer-events-none fixed inset-x-0 bottom-0 top-20 z-0 overflow-hidden bg-[#f8efe1] md:top-24">
+      <div className="pointer-events-none fixed inset-x-0 top-20 z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(124px+env(safe-area-inset-bottom))] md:bottom-0 md:top-24">
         <picture className="absolute inset-0 block h-full w-full">
           <source
             media="(min-width: 768px)"
@@ -206,32 +206,8 @@ export default function App() {
           />
           <img
             src="/assets/Mobilesuperdad.png"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full scale-[1.08] object-cover object-center opacity-80 blur-xl md:scale-[1.04] md:opacity-75 md:blur-lg"
-          />
-        </picture>
-
-        <div className="relative flex h-full items-end justify-center pb-[124px] md:hidden">
-          <img
-            src="/assets/Mobilesuperdad.png"
             alt="SuperDad Hero"
-            className="h-full w-full object-contain object-top"
-            style={{
-              maxHeight: "calc(100dvh - 12.75rem)",
-            }}
-          />
-        </div>
-
-        <picture className="relative hidden h-[calc(100%-176px)] w-full md:block">
-          <source
-            media="(min-width: 768px)"
-            srcSet="/assets/desktopsuperdad.png"
-          />
-          <img
-            src="/assets/Mobilesuperdad.png"
-            alt="SuperDad Hero"
-            className="h-full w-full object-contain object-top"
+            className="h-full w-full object-cover object-top"
           />
         </picture>
       </div>
