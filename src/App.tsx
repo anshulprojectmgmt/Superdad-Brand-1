@@ -212,7 +212,19 @@ export default function App() {
           />
         </picture>
 
-        <picture className="relative block h-[calc(100%-124px)] w-full md:h-[calc(100%-176px)]">
+        <div className="relative flex h-full items-end justify-center px-4 pb-[124px] md:hidden">
+          <img
+            src="/assets/Mobilesuperdad.png"
+            alt="SuperDad Hero"
+            className="h-auto w-full object-contain object-top"
+            style={{
+              maxHeight: "calc(100dvh - 12.75rem)",
+              maxWidth: "min(25.5rem, calc(100vw - 2rem))",
+            }}
+          />
+        </div>
+
+        <picture className="relative hidden h-[calc(100%-176px)] w-full md:block">
           <source
             media="(min-width: 768px)"
             srcSet="/assets/desktopsuperdad.png"
@@ -226,11 +238,11 @@ export default function App() {
       </div>
 
       <main className="relative z-10">
-        <section className="relative h-[100svh]">
+        <section className="relative min-h-[100dvh] overflow-hidden md:h-[100svh]">
           <div className="absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:px-12">
-            <div className="mx-auto flex h-[124px] max-w-7xl items-end justify-center pb-4 text-center md:h-[176px] md:items-center md:pb-0">
+            <div className="mx-auto flex min-h-[124px] max-w-7xl items-end justify-center px-2 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 text-center md:h-[176px] md:items-center md:px-0 md:pb-0 md:pt-0">
               <div className="max-w-2xl md:max-w-5xl">
-                <h2 className="text-[2.15rem] font-bold leading-[1.08] tracking-[0.02em] text-on-surface md:hidden">
+                <h2 className="text-[clamp(2.15rem,9.8vw,2.75rem)] font-bold leading-[0.96] tracking-[0.035em] text-on-surface md:hidden">
                   Our Joyful
                   <br />
                   <span className="text-orange-700">Creations</span>
