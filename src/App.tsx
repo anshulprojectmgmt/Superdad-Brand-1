@@ -184,31 +184,29 @@ export default function App() {
         </nav>
       </header>
 
-      <div className="pointer-events-none fixed inset-x-0 top-[4.25rem] z-0 overflow-hidden bg-[#f8efe1] bottom-[calc(106px+env(safe-area-inset-bottom))] md:hidden">
-        <picture className="absolute inset-0 block h-full w-full">
+      <div className="pointer-events-none fixed inset-x-0 top-[4.25rem] bottom-[calc(112px+env(safe-area-inset-bottom))] z-0 overflow-hidden bg-[#f8efe1] md:hidden">
+        <picture className="absolute inset-0 flex items-center justify-center px-4 py-2">
           <source
             media="(min-width: 768px)"
             srcSet="/assets/desktopsuperdad.png"
           />
           <img
             src="/assets/Mobilesuperdad.png"
-            alt="SuperDad Hero"
-            className="h-full w-full object-cover object-top"
+            alt="SuperDad hero artwork"
+            className="mobile-hero-art h-full w-full object-contain object-center"
           />
         </picture>
       </div>
 
       <main className="relative z-10">
         <section className="relative min-h-[100dvh] overflow-hidden md:hidden">
-          <div className="absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
-            <div className="mx-auto flex min-h-[106px] max-w-7xl items-end justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-center">
-              <div className="max-w-2xl">
-                <h2 className="text-[clamp(2rem,9.1vw,2.55rem)] font-bold leading-[0.94] tracking-[0.035em] text-on-surface">
-                  Our Joyful
-                  <br />
-                  <span className="text-orange-700">Creations</span>
-                </h2>
-              </div>
+          <div className="mobile-hero-title absolute inset-x-0 bottom-0 border-t border-white/20 bg-white/72 px-6 shadow-[0_-18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl">
+            <div className="mx-auto flex min-h-[112px] max-w-7xl items-end justify-center px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 text-center">
+              <h2 className="text-[clamp(2rem,9.1vw,2.55rem)] font-bold leading-[0.96] tracking-[0.02em] text-on-surface">
+                Our Joyful
+                <br />
+                <span className="text-orange-700">Creation</span>
+              </h2>
             </div>
           </div>
         </section>

@@ -63,3 +63,46 @@
     font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24;
   }
 }
+
+@layer utilities {
+  .mobile-hero-art {
+    animation: mobile-hero-rise 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      mobile-hero-float 6s ease-in-out 900ms infinite;
+  }
+
+  .mobile-hero-title {
+    animation: mobile-title-rise 760ms cubic-bezier(0.2, 0.8, 0.2, 1) 220ms both;
+  }
+}
+
+@keyframes mobile-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes mobile-hero-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes mobile-title-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
